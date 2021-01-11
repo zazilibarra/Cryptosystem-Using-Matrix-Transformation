@@ -1,0 +1,19 @@
+{
+  "name": "cryptosystem-using-matrix-transformation",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zazilibarra/Cryptosystem-Using-Matrix-Transformation.git"
+  },
+  "author": "Zazil Ibarra",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/zazilibarra/Cryptosystem-Using-Matrix-Transformation/issues"
+  },
+  "homepage": "https://github.com/zazilibarra/Cryptosystem-Using-Matrix-Transformation#readme"
+}
