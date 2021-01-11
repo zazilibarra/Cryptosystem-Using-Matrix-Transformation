@@ -18,6 +18,8 @@
   "homepage": "https://github.com/zazilibarra/Cryptosystem-Using-Matrix-Transformation#readme",
   "dependencies": {
     "ejs": "^3.1.5",
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "matrix-js": "^1.5.1",
+    "pngjs": "^6.0.0"
   }
 }
