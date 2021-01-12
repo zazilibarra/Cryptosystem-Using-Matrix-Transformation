@@ -12,16 +12,58 @@
 </head>
 
 <body>
-    <% if(data) { %>
-        <%= data %>
-            <% } %>
+    <nav class="navbar navbar-dark bg-dark" style="background-color: #e3f2fd;">
+        <a class="navbar-brand">Cryptosystem Using Matrix Transformation</a>
+    </nav>
+    <br>
+    <div class="container">
+        <ul class="nav nav-tabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a class="nav-link active" data-toggle="tab" href="#text" role="tab" aria-controls="text"
+                    aria-selected="true">Texto</a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" data-toggle="tab" href="#image" role="tab" aria-controls="image"
+                    aria-selected="false">Imagen</a>
+            </li>
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="text" role="tabpanel" aria-labelledby="text-tab">
+                <form>
+                    <div class="form-group">
+                        <label>Entrada</label>
+                        <textarea class="form-control" rows="3"></textarea>
+                    </div>
+                </form>
+                <% if(A) { %>
+                    <% for (let i = 0; i < A.length; i++) { %>
+                        [
+                        <% for (let j = 0; j < A.length; j++) { %>
+                            <%= A[i][j] %> ,
+                        <% } %>
+                        ]
+                        <br>
+                    <% } %>
+                <% } %>
 
-                <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
-                    integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
-                    crossorigin="anonymous"></script>
-                <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"
-                    integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx"
-                    crossorigin="anonymous"></script>
+            </div>
+            <div class="tab-pane fade" id="image" role="tabpanel" aria-labelledby="image-tab">
+                <form>
+                    <div class="form-group">
+                        <label>Selecccionar imagen PNG</label>
+                        <input type="file" class="form-control-file">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx"
+        crossorigin="anonymous"></script>
 </body>
 
 </html>
