@@ -6,8 +6,81 @@ var fs = require("fs"), PNG = require("pngjs").PNG;
 
 app.set('view engine', 'ejs');
 
-
 router.get("/", (req, res) => {
+    res.render("home");
+});
+
+router.post("/image", (req, res) => {
+    var tmp_path = req.files.image.path;
+    // Ruta donde colocaremos las imagenes
+    var target_path = './src/img/img.png' ;
+    var mod = 256;
+    var A = getMatrix(mod);
+    var mA = matrix(A);
+
+
+    // Comprobamos que el fichero es de tipo imagen
+    if (req.files.image.type.indexOf('image') == -1) {
+        res.send('El fichero que deseas subir no es una imagen');
+    }
+    else {
+        // Movemos el fichero temporal tmp_path al directorio que hemos elegido en target_path
+        fs.rename(tmp_path, target_path, function (err) {
+            if (err) throw err;
+            // Eliminamos el fichero temporal
+            fs.unlink(tmp_path, function () {
+                if (err) throw err;
+
+                fs.createReadStream(target_path)
+                    .pipe(
+                        new PNG({
+                            filterType: 4,
+                        })
+                    )
+                    .on("parsed", function () {
+                        for (var y = 0; y < this.height; y++) {
+                            for (var x = 0; x < this.width - 6; x += 6) {
+                                var R = [], G = [], B = [];
+
+                                for (var i = 0; i < 6; i++) {
+                                    var idx = (this.width * y + (x + i)) << 2;
+
+                                    R.push([this.data[idx]]);
+                                    G.push([this.data[idx + 1]]);
+                                    B.push([this.data[idx + 2]]);
+                                }
+
+                                R = matrix(R);
+                                G = matrix(G);
+                                B = matrix(B);
+
+                                var resR = mA.prod(R);
+                                var resG = mA.prod(G);
+                                var resB = mA.prod(B);
+
+                                for (var i = 0; i < 6; i++) {
+                                    var idx = (this.width * y + (x + i)) << 2;
+
+                                    this.data[idx] = resR[i][0] % mod;
+                                    this.data[idx + 1] = resG[i][0] % mod;
+                                    this.data[idx + 2] = resB[i][0] % mod;
+                                }
+                            }
+                        }
+
+                        this.pack().pipe(fs.createWriteStream("./public/cifrada.png"));
+
+                        res.render("result", {
+                            A: A,
+                            img: "/cifrada.png"
+                        });
+                    });
+            });
+        });
+    }
+});
+
+router.post("/text", (req, res) => {
     var texto = "Palabras";
     var textASCII = [];
     var mod = 256;
@@ -20,53 +93,7 @@ router.get("/", (req, res) => {
 
     // console.log(textASCII);
 
-    fs.createReadStream("./src/public/img/img2.png")
-        .pipe(
-            new PNG({
-                filterType: 4,
-            })
-        )
-        .on("parsed", function () {
-
-            for (var y = 0; y < this.height; y++) {
-                // console.log(`y=${y}`);
-                for (var x = 0; x < this.width-6; x += 6) {
-                    // console.log(`x=${x}`);
-                    var R = [], G = [], B = [];
-
-                    for (var i = 0; i < 6; i++) {
-                        var idx = (this.width * y + (x + i)) << 2;
-
-                        R.push([this.data[idx]]);
-                        G.push([this.data[idx + 1]]);
-                        B.push([this.data[idx + 2]]);
-                    }
-
-                    R = matrix(R);
-                    G = matrix(G);
-                    B = matrix(B);
-
-                    var resR = mA.prod(R);
-                    var resG = mA.prod(G);
-                    var resB = mA.prod(B);
-
-                    for (var i = 0; i < 6; i++) {
-                        var idx = (this.width * y + (x + i)) << 2;
-
-                        this.data[idx] = resR[i][0] % mod;
-                        this.data[idx + 1] = resG[i][0] % mod;
-                        this.data[idx + 2] = resB[i][0] % mod;
-
-                        // and reduce opacity
-                        //this.data[idx + 3] = this.data[idx + 3] >> 1;
-                    }
-                }
-            }
-
-            this.pack().pipe(fs.createWriteStream("./src/public/img/cifrada.png"));
-        });
-
-    res.render("home", {
+    res.render("result", {
         A: A
     });
 });
@@ -74,8 +101,8 @@ router.get("/", (req, res) => {
 function getMatrix(mod) {
     var n = 6;
     var k = 3;
-    var t = Math.floor(Math.random() * mod-1) + 1; 
-    var s = Math.floor(Math.random() * mod-1) + 1;
+    var t = Math.floor(Math.random() * mod - 1) + 1;
+    var s = Math.floor(Math.random() * mod - 1) + 1;
     var a11 = [], a22 = [], a12 = [], a21 = [], I = [], A = [];
 
     for (let i = 0; i < n / 2; i++) {

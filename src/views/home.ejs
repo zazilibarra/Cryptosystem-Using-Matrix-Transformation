@@ -13,7 +13,7 @@
 
 <body>
     <nav class="navbar navbar-dark bg-dark" style="background-color: #e3f2fd;">
-        <a class="navbar-brand">Cryptosystem Using Matrix Transformation</a>
+        <a href="/" class="navbar-brand">Cryptosystem Using Matrix Transformation</a>
     </nav>
     <br>
     <div class="container">
@@ -29,30 +29,22 @@
         </ul>
         <div class="tab-content">
             <div class="tab-pane fade show active" id="text" role="tabpanel" aria-labelledby="text-tab">
-                <form>
+                <form action="/text" method="POST">
                     <div class="form-group">
                         <label>Entrada</label>
-                        <textarea class="form-control" rows="3"></textarea>
+                        <textarea name="text" class="form-control" rows="3"></textarea>
                     </div>
+                    <button class="btn btn-primary" type="submit">Enviar</button>
                 </form>
-                <% if(A) { %>
-                    <% for (let i = 0; i < A.length; i++) { %>
-                        [
-                        <% for (let j = 0; j < A.length; j++) { %>
-                            <%= A[i][j] %> ,
-                        <% } %>
-                        ]
-                        <br>
-                    <% } %>
-                <% } %>
-
             </div>
             <div class="tab-pane fade" id="image" role="tabpanel" aria-labelledby="image-tab">
-                <form>
+                <br>
+                <form action="/image" method="POST" enctype="multipart/form-data">
                     <div class="form-group">
                         <label>Selecccionar imagen PNG</label>
-                        <input type="file" class="form-control-file">
+                        <input type="file" name="image" class="form-control-file" accept="image/png">
                     </div>
+                    <button class="btn btn-primary" type="submit">Enviar</button>
                 </form>
             </div>
         </div>
