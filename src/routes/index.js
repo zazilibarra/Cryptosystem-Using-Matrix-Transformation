@@ -16,8 +16,8 @@ router.post("/encriptar", (req, res) => {
     var target_path = './src/img/img.png';
     var mod = 256;
     var n = 4;
-    var t = Math.floor(Math.random() * mod - 1) + 1;
-    var s = Math.floor(Math.random() * mod - 1) + 1;
+    var t = Math.floor(Math.random() * mod ) + 1;
+    var s = Math.floor(Math.random() * mod ) + 1;
     var A = getMatrix(mod, n, s, t);
     var mA = matrix(A);
 
@@ -41,7 +41,7 @@ router.post("/encriptar", (req, res) => {
                     )
                     .on("parsed", function () {
                         for (var y = 0; y < this.height; y++) {
-                            for (var x = 0; x < this.width - n; x += n) {
+                            for (var x = 0; x < this.width; x += n) {
                                 var R = [], G = [], B = [];
 
                                 for (var i = 0; i < n; i++) {
@@ -50,6 +50,11 @@ router.post("/encriptar", (req, res) => {
                                     R.push([this.data[idx]]);
                                     G.push([this.data[idx + 1]]);
                                     B.push([this.data[idx + 2]]);
+                                }
+
+                                if(R.length < n){
+                                    console.log("menos")
+
                                 }
 
                                 R = matrix(R);
@@ -144,11 +149,11 @@ router.post("/desencriptar", (req, res) => {
                             }
                         }
 
-                        this.pack().pipe(fs.createWriteStream("./public/cifrada.png"));
+                        this.pack().pipe(fs.createWriteStream("./public/descifrada.png"));
 
                         res.render("result-img", {
                             A: A,
-                            img: "/cifrada.png",
+                            img: "/descifrada.png",
                             seed: s,
                             t: t
                         });
