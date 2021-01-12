@@ -10,14 +10,16 @@ router.get("/", (req, res) => {
     res.render("home");
 });
 
-router.post("/image", (req, res) => {
+router.post("/encriptar", (req, res) => {
     var tmp_path = req.files.image.path;
     // Ruta donde colocaremos las imagenes
-    var target_path = './src/img/img.png' ;
+    var target_path = './src/img/img.png';
     var mod = 256;
-    var A = getMatrix(mod);
+    var n = 4;
+    var t = Math.floor(Math.random() * mod - 1) + 1;
+    var s = Math.floor(Math.random() * mod - 1) + 1;
+    var A = getMatrix(mod, n, s, t);
     var mA = matrix(A);
-
 
     // Comprobamos que el fichero es de tipo imagen
     if (req.files.image.type.indexOf('image') == -1) {
@@ -39,10 +41,10 @@ router.post("/image", (req, res) => {
                     )
                     .on("parsed", function () {
                         for (var y = 0; y < this.height; y++) {
-                            for (var x = 0; x < this.width - 6; x += 6) {
+                            for (var x = 0; x < this.width - n; x += n) {
                                 var R = [], G = [], B = [];
 
-                                for (var i = 0; i < 6; i++) {
+                                for (var i = 0; i < n; i++) {
                                     var idx = (this.width * y + (x + i)) << 2;
 
                                     R.push([this.data[idx]]);
@@ -58,7 +60,7 @@ router.post("/image", (req, res) => {
                                 var resG = mA.prod(G);
                                 var resB = mA.prod(B);
 
-                                for (var i = 0; i < 6; i++) {
+                                for (var i = 0; i < n; i++) {
                                     var idx = (this.width * y + (x + i)) << 2;
 
                                     this.data[idx] = resR[i][0] % mod;
@@ -70,9 +72,85 @@ router.post("/image", (req, res) => {
 
                         this.pack().pipe(fs.createWriteStream("./public/cifrada.png"));
 
-                        res.render("result", {
+                        res.render("result-img", {
                             A: A,
-                            img: "/cifrada.png"
+                            img: "/cifrada.png",
+                            seed: s,
+                            t: t
+                        });
+                    });
+            });
+        });
+    }
+});
+
+router.post("/desencriptar", (req, res) => {
+    var tmp_path = req.files.image.path;
+    // Ruta donde colocaremos las imagenes
+    var target_path = './src/img/img.png';
+    var mod = 256;
+    var n = 4;
+    var s = req.body.seed;
+    var t = req.body.t;
+    var A = getMatrix(mod, n, s, t);
+    var mA = matrix(A);
+
+    // Comprobamos que el fichero es de tipo imagen
+    if (req.files.image.type.indexOf('image') == -1) {
+        res.send('El fichero que deseas subir no es una imagen');
+    }
+    else {
+        // Movemos el fichero temporal tmp_path al directorio que hemos elegido en target_path
+        fs.rename(tmp_path, target_path, function (err) {
+            if (err) throw err;
+            // Eliminamos el fichero temporal
+            fs.unlink(tmp_path, function () {
+                if (err) throw err;
+
+                fs.createReadStream(target_path)
+                    .pipe(
+                        new PNG({
+                            filterType: 4,
+                        })
+                    )
+                    .on("parsed", function () {
+                        for (var y = 0; y < this.height; y++) {
+                            for (var x = 0; x < this.width - n; x += n) {
+                                var R = [], G = [], B = [];
+
+                                for (var i = 0; i < n; i++) {
+                                    var idx = (this.width * y + (x + i)) << 2;
+
+                                    R.push([this.data[idx]]);
+                                    G.push([this.data[idx + 1]]);
+                                    B.push([this.data[idx + 2]]);
+                                }
+
+                                R = matrix(R);
+                                G = matrix(G);
+                                B = matrix(B);
+
+                                var resR = mA.prod(R);
+                                var resG = mA.prod(G);
+                                var resB = mA.prod(B);
+
+                                for (var i = 0; i < n; i++) {
+                                    var idx = (this.width * y + (x + i)) << 2;
+
+                                    this.data[idx] = resR[i][0] % mod;
+                                    this.data[idx + 1] = resG[i][0] % mod;
+                                    this.data[idx + 2] = resB[i][0] % mod;
+                                }
+                            }
+                        }
+
+                        this.pack().pipe(fs.createWriteStream("./public/cifrada.png"));
+
+                        res.render("result-img", {
+                            A: A,
+                            img: "/cifrada.png",
+                            seed: s,
+                            t: t
                         });
                     });
             });
@@ -81,28 +159,42 @@ router.post("/image", (req, res) => {
 });
 
 router.post("/text", (req, res) => {
-    var texto = "Palabras";
-    var textASCII = [];
-    var mod = 256;
-    var A = getMatrix(mod);
+    var texto = req.body.text;
+    var textEncript = [];
+    var mod = 95;
+    var n = 4;
+    var A = getMatrix(mod, n);
     var mA = matrix(A);
 
-    // for (let l of texto) {
-    //     textASCII.push(l.charCodeAt(0) % mod);
-    // }
+    for (var x = 0; x < texto.length; x += n) {
+        var R = [];
 
-    // console.log(textASCII);
+        for (var i = 0; i < n; i++) {
+            var idx = (n * x) + i;
 
-    res.render("result", {
-        A: A
+            R.push([(texto.charCodeAt(idx) - 32) % mod]);
+        }
+        console.log(R);
+
+        R = matrix(R);
+
+        var resR = mA.prod(R);
+
+        for (var i = 0; i < n; i++) {
+            var idx = (n * x) + i;
+
+            textEncript[idx] = R[i][0] % mod;
+        }
+    }
+
+    res.render("result-text", {
+        A: A,
+        text: textEncript
     });
 });
 
-function getMatrix(mod) {
-    var n = 6;
+function getMatrix(mod, n, s, t) {
     var k = 3;
-    var t = Math.floor(Math.random() * mod - 1) + 1;
-    var s = Math.floor(Math.random() * mod - 1) + 1;
     var a11 = [], a22 = [], a12 = [], a21 = [], I = [], A = [];
 
     for (let i = 0; i < n / 2; i++) {

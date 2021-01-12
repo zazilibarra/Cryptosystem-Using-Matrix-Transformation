@@ -17,18 +17,33 @@
     </nav>
     <br>
     <div class="container">
-        <img src="<%= img %>" alt="">
-        <br>
-        <% if(A) { %>
-            <% for (let i=0; i < A.length; i++) { %>
-                [
-                <% for (let j=0; j < A.length; j++) { %>
-                    <%= A[i][j] %> ,
-                <% } %>
-                ]
+        <div class="row">
+            <div class="col-md-4">
+                <img src="<%= img %>" alt="">
                 <br>
-            <% } %>
-        <% } %> 
+                <br>
+                <a class="btn btn-success" href="<%= img %>" download="EI.png">Descargar</a>
+            </div>
+            <div class="col-md-4">
+                <h3>Matriz</h3>
+                <% if(A) { %>
+                    <% for (let i=0; i < A.length; i++) { %>
+                        [
+                        <% for (let j=0; j < A.length; j++) { %>
+                            <%= A[i][j] %> ,
+                                <% } %>
+                                    ]
+                                    <br>
+                                    <% } %>
+                                        <% } %>
+            </div>
+            <div class="col-md-4">
+                Seed: <%= seed %> 
+                <br>
+                t: <%= t %> 
+            </div>
+        </div>
+        <br>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
